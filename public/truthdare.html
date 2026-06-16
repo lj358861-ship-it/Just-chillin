@@ -1,0 +1,366 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Will U Dare?😈</title>
+    <link rel="stylesheet" href="truthdare.css" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Syne:wght@400;700;800&family=Space+Mono:wght@400;700&display=swap"
+      rel="stylesheet"
+    />
+    <canvas id="particles"></canvas>
+  </head>
+  <body>
+    <!-- FIRST TIME: PROFILE CREATION -->
+    <div id="profileCreate" class="section" style="display: none">
+      <div class="panel">
+        <div class="panel-icon-header">😈</div>
+        <h2 class="panel-title">Crée ton profil</h2>
+        <p class="sub-title" style="text-align: center; margin-bottom: 18px">
+          Enregistré sur cet appareil — une seule fois !
+        </p>
+        <input
+          id="profileNameInput"
+          class="input-field"
+          placeholder="Ton prénom"
+          maxlength="20"
+          autocomplete="off"
+        />
+        <p class="sub-title" style="margin-top: 20px">Choisis ton avatar</p>
+        <div class="avatar-grid" id="avatarGrid"></div>
+        <div class="avatar-selected-preview" id="avatarPreview">
+          <span id="avatarPreviewEmoji">❓</span>
+          <span class="avatar-preview-label">Aucun avatar choisi</span>
+        </div>
+        <button
+          class="btn btn-primary"
+          style="margin-top: 20px"
+          onclick="saveProfile()"
+        >
+          C'est parti 🚀
+        </button>
+      </div>
+    </div>
+
+    <!-- MENU -->
+    <div id="menu" class="section" style="display: none">
+      <div class="menu-wrap">
+        <div class="logo-wrap">
+          <div class="logo-badge">😈</div>
+          <h1 class="logo-title">
+            ACTION<span class="logo-ou">ou</span>VÉRITÉ
+          </h1>
+          <p class="logo-sub">Will U Dare? 😈</p>
+        </div>
+
+        <div class="identity-card" id="identityCard">
+          <span class="identity-avatar" id="menuAvatar">❓</span>
+          <div class="identity-info">
+            <span class="identity-name" id="menuName">...</span>
+            <span class="identity-id" id="menuId">ID: ...</span>
+          </div>
+          <button
+            class="btn-edit-profile"
+            onclick="editProfile()"
+            title="Modifier profil"
+          >
+            ✏️
+          </button>
+          <div
+            id="connectionStatus"
+            class="connection-status online"
+            title="Connecté"
+          ></div>
+        </div>
+
+        <div class="menu-btns">
+          <button class="btn btn-primary" onclick="showModeSelect('offline')">
+            <span class="btn-icon">🎮</span> Jouer Hors-ligne
+          </button>
+          <button class="btn btn-secondary" onclick="showModeSelect('online')">
+            <span class="btn-icon">🌍</span> Jouer En Ligne
+          </button>
+          <button class="btn btn-ghost" onclick="showDiv('settings')">
+            <span class="btn-icon">⚙️</span> Paramètres
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- MODE SELECT -->
+    <div id="modeSelect" class="section" style="display: none">
+      <div class="panel scroll-panel">
+        <h2 class="panel-title">🎭 Choisis ton mode</h2>
+        <p class="sub-title" style="text-align: center; margin-bottom: 4px">
+          Chaque mode = sa propre vibe
+        </p>
+        <div class="modes-grid" id="modesGrid"></div>
+        <button class="btn btn-ghost mt" onclick="showDiv('menu')">
+          ← Retour
+        </button>
+      </div>
+    </div>
+
+    <!-- SETTINGS -->
+    <div id="settings" class="section" style="display: none">
+      <div class="panel">
+        <h2 class="panel-title">⚙️ Paramètres</h2>
+        <label class="toggle-label">
+          <span>🔊 Sons</span>
+          <div class="toggle-wrap">
+            <input type="checkbox" id="soundToggle" checked />
+            <span class="toggle-slider"></span>
+          </div>
+        </label>
+        <button class="btn btn-ghost mt" onclick="showDiv('menu')">
+          ← Retour
+        </button>
+      </div>
+    </div>
+
+    <!-- OFFLINE ERROR PAGE -->
+    <div id="offlineError" class="section" style="display: none">
+      <div class="panel">
+        <div
+          class="panel-icon-header"
+          style="animation: pulse 2s ease-in-out infinite"
+        >
+          📡
+        </div>
+        <h2 class="panel-title">Pas de connexion</h2>
+        <p
+          class="sub-title"
+          style="text-align: center; margin-bottom: 24px; line-height: 1.6"
+        >
+          ⚠️ Désolé, il faut une connexion Internet pour rejoindre une salle en
+          ligne.<br /><br />Vérifie ta connexion et réessaye.
+        </p>
+        <button
+          class="btn btn-primary"
+          onclick="reconnectToRoom()"
+          style="margin-bottom: 12px"
+        >
+          🔄 Revenir à ma salle
+        </button>
+        <button class="btn btn-ghost" onclick="showDiv('menu')">
+          ← Retour au menu
+        </button>
+      </div>
+    </div>
+
+    <!-- ONLINE LOBBY -->
+    <div id="onlineLobby" class="section" style="display: none">
+      <div class="panel scroll-panel">
+        <h2 class="panel-title">🌍 Salles en ligne</h2>
+        <div class="mode-badge-display" id="lobbyModeBadge"></div>
+
+        <div class="form-group">
+          <h3 class="sub-title">Créer une salle</h3>
+          <input
+            id="roomName"
+            class="input-field"
+            placeholder="Nom de la salle"
+          />
+          <input
+            id="roomPassword"
+            class="input-field"
+            placeholder="Mot de passe (optionnel)"
+          />
+          <input
+            id="maxPlayers"
+            class="input-field"
+            type="number"
+            placeholder="Joueurs max"
+            value="4"
+            min="2"
+            max="10"
+          />
+          <button class="btn btn-primary" onclick="createRoom()">Créer</button>
+        </div>
+
+        <div class="form-group">
+          <h3 class="sub-title">Rejoindre</h3>
+          <div id="roomsList" class="rooms-list"></div>
+        </div>
+
+        <button class="btn btn-ghost mt" onclick="showDiv('modeSelect')">
+          ← Retour
+        </button>
+      </div>
+    </div>
+
+    <!-- ROOM QUESTIONS SETUP (ONLINE) - only for custom mode -->
+    <div id="playerSetup" class="section" style="display: none">
+      <div class="panel scroll-panel">
+        <h2 class="panel-title">📝 Tes questions</h2>
+
+        <div class="identity-card compact" id="setupIdentityCard">
+          <span class="identity-avatar" id="setupAvatar">❓</span>
+          <div class="identity-info">
+            <span class="identity-name" id="setupName">...</span>
+            <span class="identity-id" id="setupId">ID: ...</span>
+          </div>
+        </div>
+
+        <div id="customQuestionsForm">
+          <h3 class="sub-title">Tes Vérités (3)</h3>
+          <input class="truth input-field" placeholder="Vérité 1" />
+          <input class="truth input-field" placeholder="Vérité 2" />
+          <input class="truth input-field" placeholder="Vérité 3" />
+          <h3 class="sub-title">Tes Gages (3)</h3>
+          <input class="dare input-field" placeholder="Gage 1" />
+          <input class="dare input-field" placeholder="Gage 2" />
+          <input class="dare input-field" placeholder="Gage 3" />
+        </div>
+
+        <div
+          id="predefinedModeInfo"
+          style="display: none"
+          class="mode-info-box"
+        ></div>
+
+        <div id="joinError" class="join-error" style="display: none"></div>
+
+        <button
+          class="btn btn-primary"
+          style="margin-top: 12px"
+          onclick="joinRoom()"
+        >
+          Rejoindre 🚀
+        </button>
+        <button class="btn btn-ghost mt" onclick="showDiv('onlineLobby')">
+          ← Retour
+        </button>
+      </div>
+    </div>
+
+    <!-- OFFLINE SETUP -->
+    <div id="setup" class="section" style="display: none">
+      <div class="panel scroll-panel">
+        <h2 class="panel-title">🎮 Configuration</h2>
+        <div class="mode-badge-display" id="setupModeBadge"></div>
+
+        <div id="step1">
+          <h3 class="sub-title">Étape 1 — Nombre de joueurs</h3>
+          <input
+            type="number"
+            id="playerCount"
+            class="input-field input-center"
+            min="2"
+            max="10"
+            value="2"
+          />
+          <button class="btn btn-primary" onclick="goToNames()">
+            Suivant →
+          </button>
+        </div>
+
+        <div id="step2" style="display: none">
+          <h3 class="sub-title">Étape 2 — Prénoms</h3>
+          <div id="namesContainer"></div>
+          <button class="btn btn-primary" onclick="goToQuestions()">
+            Suivant →
+          </button>
+        </div>
+
+        <div id="step3" style="display: none">
+          <h3 class="sub-title" id="step3Title">Étape 3 — Questions & Gages</h3>
+          <div id="questionsContainer"></div>
+          <div
+            id="predefinedModeNotice"
+            style="display: none"
+            class="mode-info-box"
+          ></div>
+          <button class="btn btn-primary" onclick="startGame()">
+            🎲 Lancer le jeu
+          </button>
+        </div>
+
+        <button class="btn btn-ghost mt" onclick="showDiv('modeSelect')">
+          ← Retour
+        </button>
+      </div>
+    </div>
+
+    <!-- GAME CONTAINER -->
+    <div id="container" class="section game-screen" style="display: none">
+      <h2 id="roomTitle" class="room-title"></h2>
+      <div class="mode-indicator" id="modeIndicator"></div>
+      <div id="playersList" class="players-list"></div>
+
+      <div class="bottle-wrap">
+        <img src="MOPN9382.png" alt="Bouteille" id="bottle" />
+      </div>
+
+      <div class="journal-panel" id="gameJournal">
+        <div class="journal-header">
+          <span>📜</span>
+          <h3>Journal de jeu</h3>
+        </div>
+        <div class="journal-entries" id="journalEntries">
+          <div class="journal-entry">
+            Bienvenue au journal : toutes les actions et synchronisations
+            apparaîtront ici.
+          </div>
+        </div>
+      </div>
+
+      <button id="startBtn" class="btn btn-spin">TOURNER 🍾</button>
+
+      <div id="timerBox" class="timer-box" style="display: none">10</div>
+
+      <div class="card-system">
+        <div class="game-card card-idle" id="cardIdle">
+          <div class="card-emoji">🍾</div>
+          <p class="card-hint">Tourne la bouteille<br />pour commencer !</p>
+        </div>
+
+        <div
+          class="game-card card-result"
+          id="cardResult"
+          style="display: none"
+        >
+          <div class="result-tag" id="resultTag">VÉRITÉ</div>
+          <div class="result-player-wrap">
+            <span class="result-avatar" id="resultAvatar">😶</span>
+            <div class="result-player" id="resultPlayer">Joueur</div>
+          </div>
+          <div class="result-emoji" id="resultEmoji">😏</div>
+          <button class="btn btn-reveal" id="btnReveal">
+            Voir la question →
+          </button>
+        </div>
+
+        <div
+          class="game-card card-question"
+          id="cardQuestion"
+          style="display: none"
+        >
+          <div class="question-tag" id="questionTag">LA QUESTION</div>
+          <p class="question-text" id="questionText">...</p>
+          <button class="btn btn-next" onclick="resetCards()">Suivant ↩</button>
+        </div>
+      </div>
+
+      <button class="btn btn-ghost mt" onclick="leaveRoom()">Quitter</button>
+    </div>
+
+    <!-- Firebase DOIT être chargé avant truthdare.js -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
+    <script>
+      firebase.initializeApp({
+        apiKey: "AIzaSyCm_y55MPNksHqqA_4H6xbDzMM6X1sfL18",
+        authDomain: "truth-or-dare-e5602.firebaseapp.com",
+        databaseURL: "https://truth-or-dare-e5602-default-rtdb.firebaseio.com",
+        projectId: "truth-or-dare-e5602",
+        storageBucket: "truth-or-dare-e5602.appspot.com",
+        messagingSenderId: "748796907878",
+        appId: "1:748796907878:web:49ad6085639220ec08b8a7",
+      });
+      const db = firebase.database();
+    </script>
+    <script src="truthdare.js"></script>
+  </body>
+</html>
