@@ -1,0 +1,16 @@
+{
+  "name": "just-chillin",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Just Chillin - hub de jeux (ColorShow, Loup-Garou, Action ou Verite, Metropoly) avec sync Firebase Realtime DB",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "express": "^4.19.2"
+  }
+}
